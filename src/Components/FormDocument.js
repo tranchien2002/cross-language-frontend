@@ -12,14 +12,19 @@ const customPanelStyle = {
 
 const FormDocument = props => {
   // let a = JSON.stringify(props);
-  const b = JSON.parse(props)
+  console.log(props)
+  let results = props
+  if(typeof(props) == 'string') {
+    results = JSON.parse(props)
+  }
+  
   return(
     <Collapse 
       bordered={false}
       defaultActiveKey={['1']}
       expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
     >
-      {b.map( (doc, index) => {
+      {results.map( (doc, index) => {
         return(
           <Panel header={doc.title} key= {index + 2} style={customPanelStyle}>
             <p>{doc.content}</p>

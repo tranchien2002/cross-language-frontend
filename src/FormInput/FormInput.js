@@ -7,19 +7,29 @@ import FormDocument from '../Components/FormDocument'
 import { Select } from 'antd';
 const Option = Select.Option;
 
- 
+const nStyle = {
+  margin: '30px'
+}
+
 class FormInput extends Component {
   constructor() {
     super();
     this.state = {
       formLayout: 'horizontal',
       document: "",
-      docsEng: ""
+      docsEng: "",
+      type: "lsh",
+      top: "1"
     };
   }
 
-  handleChange = (value) => {
-    console.log(value);
+  handleChangeTop = (e) => {
+    this.setState({top: e})
+  }
+
+  handleChangeType = (e) => {
+    console.log("type", e)
+    this.setState({type: e})
   }
 
   handleChangeDocument = (e) => {
@@ -28,8 +38,10 @@ class FormInput extends Component {
   }
 
   handleSubmit = async (e) => {
-    let res = await axios.post('http://localhost:5000/cross_languages/plagiarism_lsh', {
-      document: this.state.document
+    let type = this.state.type
+    let res = await axios.post('http://localhost:5000/cross_languages/plagiarism_' + type, {
+      document: this.state.document,
+      top: this.state.top
     })
     this.setState({docsEng: res.data.docs})
     
@@ -37,33 +49,36 @@ class FormInput extends Component {
   handleFormLayoutChange = (e) => {
     this.setState({ formLayout: e.target.value });
   }
+
   render() {
     const { TextArea } = Input;
     return (
-      <Row gutter={8}>
-        <Col span={8} offset={1}>
-          <Form layout='horizontal'>
-            <Select defaultValue="lucy" style={{ width: 120 }} onChange={this.handleChange}>
-              <Option value="jack">MinHash</Option>
-              <Option value="lucy">Matrix vector</Option>
-            </Select>
-            <Select defaultValue="lucy" style={{ width: 120 }} onChange={this.handleChange}>
-              <Option value="jack">Top 1</Option>
-              <Option value="lucy">Top 3</Option>
-              <Option value="Yiminghe">Top 5</Option>
-            </Select>
-            <Form.Item label="Document: ">
-              <TextArea rows={20} onChange={this.handleChangeDocument}></TextArea>
-            </Form.Item>
-            <Form.Item >
-              <Button type="primary" onClick={this.handleSubmit}>Submit</Button>
-            </Form.Item>
-          </Form>
-        </Col>
-        <Col span={12} offset={2}>
-          {this.state.docsEng != "" ? (FormDocument(this.state.docsEng)) : null }
-        </Col>
-      </Row>
+      <div className="navibar" style={nStyle}>
+        <Row gutter={8}>
+          <Col span={8} offset={1}>
+            <Form layout='horizontal'>
+              <Select defaultValue="lsh" style={{ width: 120 }} onChange={this.handleChangeType} value={this.state.type}>
+                <Option value="lsh">MinHash</Option>
+                <Option value="matrix">Matrix vector</Option>
+              </Select>
+              <Select defaultValue="1" style={{ width: 120 }} onChange={this.handleChangeTop} value={this.state.top}>
+                <Option value="1">Top 1</Option>
+                <Option value="3">Top 3</Option>
+                <Option value="5">Top 5</Option>
+              </Select>
+              <Form.Item label="Document: ">
+                <TextArea rows={20} onChange={this.handleChangeDocument}></TextArea>
+              </Form.Item>
+              <Form.Item >
+                <Button type="primary" onClick={this.handleSubmit}>Submit</Button>
+              </Form.Item>
+            </Form>
+          </Col>
+          <Col span={12} offset={2}>
+            {this.state.docsEng != "" ? (FormDocument(this.state.docsEng)) : null }
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
